@@ -307,6 +307,11 @@ class PaceTest(unittest.TestCase):
         self.assertEqual(cp.pace(row, time.time())[0], "known")
         self.assertIsNone(row.get("resets_ts"))  # the weekly reset is not the 5-hour reset
 
+    def test_single_window_drops_a_weekly_reset_stored_as_the_five_hour_one(self):
+        reset = time.time() + 50 * H
+        row = self.single({"status": "allowed", "resetsAt": reset, "rateLimitType": "seven_day"}, {"resets_ts": reset})
+        self.assertIsNone(row["resets_ts"])
+
     def test_single_window_rejected_week_is_full_until_its_reset(self):
         reset = time.time() + 30 * H
         row = self.single({"status": "rejected", "resetsAt": reset, "rateLimitType": "seven_day"})

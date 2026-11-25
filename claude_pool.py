@@ -864,6 +864,8 @@ def record(name, info, ran=True, error=None):
                 w = {single: single_window(info)}
             pct = lambda k: round(100 * (w.get(k) or {}).get("utilization", 0), 1) if k in w else row.get(k)  # noqa: E731
             five_reset = (w.get("five_hour") or {}).get("resetsAt") or (row.get("resets_ts") if single else info.get("resetsAt"))
+            if single and "five_hour" not in w and five_reset == (w.get("seven_day") or {}).get("resetsAt"):
+                five_reset = None  # a weekly reset that older versions stored as the 5-hour one
             row.update(status=info.get("status"), five_hour=pct("five_hour"), seven_day=pct("seven_day"),
                        resets_ts=five_reset,
                        seven_day_resets_ts=(w.get("seven_day") or {}).get("resetsAt") or row.get("seven_day_resets_ts"),
